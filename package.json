@@ -6,8 +6,7 @@
   "scripts": {
     "start": "nodemon --exec babel-node -- ./src/index.js"
   },
-  "keywords": [],
-  "author": "",
+  "author": "Rossano D'Angelo",
   "license": "ISC",
   "devDependencies": {
     "@babel/cli": "^7.12.10",
