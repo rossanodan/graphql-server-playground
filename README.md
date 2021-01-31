@@ -3,7 +3,7 @@
 Clone, install and run as follows
 
 ```
-git clone https://github.com/rossanodan/graphql-server-playground
+git clone https://github.com/rossanodan/graphql-server-playground.git
 cd graphql-server-playground
 npm install
 npm start
