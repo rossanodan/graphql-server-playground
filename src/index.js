@@ -1,25 +1,25 @@
-import express from 'express'
-import { ApolloServer, gql } from 'apollo-server-express'
+import express from "express";
+import { ApolloServer, gql } from "apollo-server-express";
 
 const persons = [
   {
     id: 1,
-    name: 'Ash Ketchum',
-    phone_number: '+440000000000',
-    email: 'ash@gmail.com',
+    name: "Ash Ketchum",
+    phone_number: "+440000000000",
+    email: "ash@gmail.com",
   },
   {
     id: 2,
-    name: 'Professor Oak',
-    phone_number: '+441111111111',
-    email: 'proak@gmail.com',
+    name: "Professor Oak",
+    phone_number: "+441111111111",
+    email: "proak@gmail.com",
   },
   {
     id: 3,
-    name: 'Gary Oak',
-    phone_number: '+442222222222',
+    name: "Gary Oak",
+    phone_number: "+442222222222",
   },
-]
+];
 
 const typeDefs = gql`
   type Person {
@@ -39,7 +39,7 @@ const typeDefs = gql`
   type Mutation {
     createPerson(person: PersonInput!): Person
   }
-`
+`;
 
 const resolvers = {
   Query: {
@@ -48,17 +48,17 @@ const resolvers = {
   },
   Mutation: {
     createPerson: (_, { person }, __) => {
-      persons.push(person)
-      return person
+      persons.push(person);
+      return person;
     },
   },
-}
+};
 
-const server = new ApolloServer({ typeDefs, resolvers })
+const server = new ApolloServer({ typeDefs, resolvers });
 
-const app = express()
-server.applyMiddleware({ app })
+const app = express();
+server.applyMiddleware({ app });
 
 app.listen({ port: 4001 }, () =>
-  console.log(`🚀 Server ready at http://localhost:4001${server.graphqlPath}`)
-)
+  console.log(`🚀 Server ready at http://localhost:4001${server.graphqlPath}`),
+);
