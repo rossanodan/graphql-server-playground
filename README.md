@@ -1,4 +1,4 @@
-# cinematheque-apollo-server-playground
+# graphql-server-playground
 
 Clone, install and run as follows
 
