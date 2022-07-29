@@ -1,5 +1,9 @@
 import express from "express";
 import { ApolloServer, gql } from "apollo-server-express";
+import { ApolloServerPluginDrainHttpServer } from "apollo-server-core";
+import http from "http";
+import cors from "cors";
+
 import { getCoursesData } from "./fetchCourses";
 
 let courses;
@@ -89,11 +93,22 @@ const resolvers = {
   },
 };
 
-const server = new ApolloServer({ typeDefs, resolvers });
-
 const app = express();
-server.applyMiddleware({ app });
+app.use(cors());
+app.use(express.json());
+const httpServer = http.createServer(app);
 
-app.listen({ port: 4001 }, () =>
-  console.log(`🚀 Server ready at http://localhost:4001${server.graphqlPath}`),
-);
+const startApolloServer = async (app, httpServer) => {
+  const server = new ApolloServer({
+    typeDefs,
+    resolvers,
+    plugins: [ApolloServerPluginDrainHttpServer({ httpServer })],
+  });
+
+  await server.start();
+  server.applyMiddleware({ app });
+}
+
+startApolloServer(app, httpServer);
+
+export default httpServer;
