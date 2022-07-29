@@ -1,64 +1,114 @@
 import express from "express";
 import { ApolloServer, gql } from "apollo-server-express";
+import { ApolloServerPluginDrainHttpServer } from "apollo-server-core";
+import http from "http";
+import cors from "cors";
 
-const persons = [
-  {
-    id: 1,
-    name: "Ash Ketchum",
-    phone_number: "+440000000000",
-    email: "ash@gmail.com",
-  },
-  {
-    id: 2,
-    name: "Professor Oak",
-    phone_number: "+441111111111",
-    email: "proak@gmail.com",
-  },
-  {
-    id: 3,
-    name: "Gary Oak",
-    phone_number: "+442222222222",
-  },
-];
+import { getCoursesData } from "./fetchCourses";
+
+let courses;
+
+async function run() {
+  courses = await getCoursesData();
+}
+
+run()
 
 const typeDefs = gql`
-  type Person {
-    id: Int!
-    name: String!
-    email: String
-  }
+
+type Course {
+    _class: String
+    id: Int
+    title: String
+    url: String
+    is_paid: Boolean
+    price: String
+    price_detail: String
+    price_serve_tracking_id: String
+    visible_instructors: [[String]]
+    image_125_H: String
+    image_240x135: String
+    is_practice_test_course: Boolean
+    image_480x270: String
+    published_title: String
+    tracking_id: String
+    predictive_score: String
+    relevancy_score: String
+    input_features: String
+    lecture_search_result: String
+    curriculum_lectures: [String]
+    order_in_results: String
+    curriculum_items: [String]
+    headline: String
+    instructor_name: String
+}
+
+input CourseInput {
+    _class: String
+    id: Int
+    title: String
+    url: String
+    is_paid: Boolean
+    price: String
+    price_detail: String
+    price_serve_tracking_id: String
+    visible_instructors: [[String]]
+    image_125_H: String
+    image_240x135: String
+    is_practice_test_course: Boolean
+    image_480x270: String
+    published_title: String
+    tracking_id: String
+    predictive_score: String
+    relevancy_score: String
+    input_features: String
+    lecture_search_result: String
+    curriculum_lectures: [String]
+    order_in_results: String
+    curriculum_items: [String]
+    headline: String
+    instructor_name: String
+}
+    
   type Query {
-    person(id: Int!): Person
-    persons: [Person]!
+    course(id: Int!): Course
+    courses: [Course]!
   }
-  input PersonInput {
-    id: Int!
-    name: String!
-    email: String
-  }
+
   type Mutation {
-    createPerson(person: PersonInput!): Person
+    createCourse(course: CourseInput!): Course
   }
 `;
 
 const resolvers = {
   Query: {
-    person: (_, { id }, __) => persons.find((person) => person.id === id),
-    persons: (_, __, ___) => persons,
+    course: (_, { id }, __) => courses.find((course) => course.id === id),
+    courses: (_, __, ___) => courses,
   },
   Mutation: {
-    createPerson: (_, { person }, __) => {
-      persons.push(person);
-      return person;
+    createCourse: (_, { course }, __) => {
+      courses.push(course);
+      return course;
     },
   },
 };
 
-const server = new ApolloServer({ typeDefs, resolvers });
-
 const app = express();
-server.applyMiddleware({ app });
+app.use(cors());
+app.use(express.json());
+const httpServer = http.createServer(app);
 
-app.listen({ port: 4001 }, () =>
-  console.log(`🚀 Server ready at http://localhost:4001${server.graphqlPath}`),
-);
+const startApolloServer = async (app, httpServer) => {
+  const server = new ApolloServer({
+    typeDefs,
+    resolvers,
+    plugins: [ApolloServerPluginDrainHttpServer({ httpServer })],
+  });
+
+  await server.start();
+  server.applyMiddleware({ app });
+}
+
+startApolloServer(app, httpServer);
+
+export default httpServer;
